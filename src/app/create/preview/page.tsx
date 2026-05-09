@@ -1,105 +1,273 @@
 "use client";
 
-import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 import { getSites } from "@/lib/site-store";
-import type { StoredSite } from "@/lib/site-store";
+import { getTemplate, type Template, type TemplatePage } from "@/lib/templates";
 import Link from "next/link";
-import { ArrowLeft, Check, Globe, Loader2, Sparkles } from "lucide-react";
-
-export default function PreviewPage() {
-  return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-violet-600" />
-      </div>
-    }>
-      <PreviewContent />
-    </Suspense>
-  );
-}
+import { ArrowLeft, Check, Edit3, Loader2, Save, Globe } from "lucide-react";
 
 function PreviewContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const id = searchParams.get("id");
-  const [site, setSite] = useState<StoredSite | null>(null);
-  const [building, setBuilding] = useState(false);
-  const [built, setBuilt] = useState(false);
+  const templateId = searchParams.get("template");
+  const [template, setTemplate] = useState<Template | null>(null);
+  const [siteName, setSiteName] = useState("");
+  const [editing, setEditing] = useState(false);
+  const [deployed, setDeployed] = useState(false);
+  const [editContent, setEditContent] = useState<Record<string, any>>({});
 
   useEffect(() => {
     if (id) {
       const sites = getSites();
       const found = sites.find((s) => s.id === id);
-      if (found) setSite(found);
+      if (found) setSiteName(found.name);
     }
-  }, [id]);
+    if (templateId) {
+      const t = getTemplate(templateId);
+      if (t) {
+        setTemplate(t);
+        // 初始化可编辑内容
+        const initContent: Record<string, any> = {};
+        t.pages.forEach((page) => {
+          Object.assign(initContent, page.content);
+        });
+        setEditContent(initContent);
+      }
+    }
+  }, [id, templateId]);
 
-  if (!site) {
+  if (!template) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-gray-400">网站未找到</p>
+        <Loader2 className="h-8 w-8 animate-spin text-violet-600" />
       </div>
     );
   }
 
   function handleDeploy() {
-    setBuilding(true);
-    // 模拟部署过程
-    setTimeout(() => {
-      setBuilt(true);
-      setBuilding(false);
-    }, 3000);
+    setDeployed(true);
+  }
+
+  // Render template preview based on template type
+  function renderPreview() {
+    const c = editContent;
+    const t = template!;
+
+    switch (template!.id) {
+      case "photography":
+        return (
+          <div>
+            <div className="bg-zinc-900 text-white px-8 py-24 text-center">
+              <p className="text-sm text-zinc-400 uppercase tracking-widest mb-4">Portfolio</p>
+              <h2 className="text-5xl font-light mb-4">{c.title || t.pages[0].content.title}</h2>
+              <p className="text-zinc-400 max-w-lg mx-auto text-lg">{c.subtitle || t.pages[0].content.subtitle}</p>
+            </div>
+            <div className="px-8 py-16">
+              <div className="grid gap-6 sm:grid-cols-3 max-w-3xl mx-auto">
+                {(c.features || t.pages[0].content.features).map((f: string, i: number) => (
+                  <div key={i} className="text-center">
+                    <div className="h-40 bg-zinc-100 rounded-lg mb-3 flex items-center justify-center text-4xl">
+                      {["📸", "🌅", "💼"][i]}
+                    </div>
+                    <p className="text-sm font-medium">{f}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="max-w-2xl mx-auto mt-12 text-center">
+                <h3 className="text-lg font-semibold mb-3">关于我</h3>
+                <p className="text-gray-500">{c.about || t.pages[0].content.about}</p>
+              </div>
+            </div>
+            <div className="bg-zinc-50 px-8 py-12 text-center">
+              <h3 className="text-lg font-semibold mb-4">联系我</h3>
+              <p className="text-gray-500 text-sm">{c.contactEmail || t.pages[0].content.contactEmail}</p>
+            </div>
+            <div className="px-8 py-4 text-center text-xs text-gray-400">
+              © 2026 {siteName || template!.name}
+            </div>
+          </div>
+        );
+
+      case "business":
+        return (
+          <div>
+            <div className="bg-gradient-to-r from-blue-700 to-blue-600 text-white px-8 py-24 text-center">
+              <h2 className="text-4xl font-bold mb-4">{c.title}</h2>
+              <p className="text-blue-100 max-w-lg mx-auto">{c.subtitle}</p>
+              <div className="mt-8 inline-flex rounded-full bg-white/20 px-6 py-2.5 text-sm">了解更多</div>
+            </div>
+            <div className="px-8 py-16">
+              <h3 className="text-center text-xl font-bold mb-10">我们的服务</h3>
+              <div className="grid gap-6 sm:grid-cols-3 max-w-3xl mx-auto">
+                {(c.services || []).map((s: string, i: number) => (
+                  <div key={i} className="rounded-xl border border-gray-100 p-6 text-center">
+                    <div className="text-3xl mb-3">{["💻", "🎨", "🔄"][i]}</div>
+                    <h4 className="font-semibold text-sm">{s}</h4>
+                  </div>
+                ))}
+              </div>
+              <div className="max-w-2xl mx-auto mt-12 text-center">
+                <h3 className="text-lg font-semibold mb-3">关于我们</h3>
+                <p className="text-gray-500">{c.about}</p>
+              </div>
+            </div>
+            <div className="bg-gray-50 px-8 py-12 text-center">
+              <h3 className="text-lg font-semibold mb-4">联系我们</h3>
+              <p className="text-gray-500 text-sm">{c.contactEmail}</p>
+            </div>
+            <div className="px-8 py-4 text-center text-xs text-gray-400">
+              © 2026 {siteName}
+            </div>
+          </div>
+        );
+
+      case "restaurant":
+        return (
+          <div>
+            <div className="bg-gradient-to-r from-amber-700 to-amber-600 text-white px-8 py-24 text-center">
+              <div className="text-6xl mb-4">🍽️</div>
+              <h2 className="text-4xl font-bold mb-4">{c.title}</h2>
+              <p className="text-amber-100 max-w-lg mx-auto">{c.subtitle}</p>
+            </div>
+            <div className="px-8 py-16">
+              <h3 className="text-center text-xl font-bold mb-10">招牌推荐</h3>
+              <div className="grid gap-6 sm:grid-cols-3 max-w-3xl mx-auto">
+                {(c.specialties || []).map((s: string, i: number) => (
+                  <div key={i} className="rounded-xl border border-gray-100 p-6 text-center">
+                    <div className="text-4xl mb-3">{["🥩", "🍝", "🍷"][i]}</div>
+                    <h4 className="font-semibold">{s}</h4>
+                  </div>
+                ))}
+              </div>
+              <div className="max-w-2xl mx-auto mt-12 text-center">
+                <h3 className="text-lg font-semibold mb-3">关于我们</h3>
+                <p className="text-gray-500">{c.about}</p>
+              </div>
+            </div>
+            <div className="bg-amber-50 px-8 py-12 text-center">
+              <h3 className="text-lg font-semibold mb-4">联系我们</h3>
+              <p className="text-gray-500 text-sm">{c.contactEmail}</p>
+              <p className="text-gray-500 text-sm mt-1">{c.address}</p>
+            </div>
+            <div className="px-8 py-4 text-center text-xs text-gray-400">
+              © 2026 {siteName}
+            </div>
+          </div>
+        );
+
+      default:
+        // Fallback: portfolio style
+        return (
+          <div>
+            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-8 py-24 text-center">
+              <h2 className="text-4xl font-bold mb-4">{c.title}</h2>
+              <p className="text-white/80 max-w-lg mx-auto">{c.subtitle}</p>
+            </div>
+            <div className="px-8 py-16">
+              <h3 className="text-center text-xl font-bold mb-10">核心亮点</h3>
+              <div className="grid gap-6 sm:grid-cols-3 max-w-3xl mx-auto">
+                {(c.highlights || c.skills || c.products || ["功能1", "功能2", "功能3"]).map((s: string, i: number) => (
+                  <div key={i} className="rounded-xl border border-gray-100 p-6 text-center">
+                    <div className="mx-auto h-12 w-12 rounded-full bg-violet-100 flex items-center justify-center mb-3">
+                      <span className="text-lg">{["⭐", "🔒", "💰"][i] || "✓"}</span>
+                    </div>
+                    <h4 className="font-semibold text-sm">{s}</h4>
+                  </div>
+                ))}
+              </div>
+              <div className="max-w-2xl mx-auto mt-12 text-center">
+                <h3 className="text-lg font-semibold mb-3">关于我们</h3>
+                <p className="text-gray-500">{c.about}</p>
+              </div>
+            </div>
+            <div className="bg-gray-50 px-8 py-12 text-center">
+              <h3 className="text-lg font-semibold mb-4">联系我们</h3>
+              <p className="text-gray-500 text-sm">{c.contactEmail}</p>
+            </div>
+            <div className="px-8 py-4 text-center text-xs text-gray-400">
+              © 2026 {siteName}
+            </div>
+          </div>
+        );
+    }
   }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       {/* Top bar */}
       <div className="flex items-center justify-between mb-8">
-        <Link
-          href="/create"
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
-        >
+        <Link href="/create" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
           <ArrowLeft className="h-4 w-4" />
-          返回修改
+          选择其他模板
         </Link>
         <div className="flex items-center gap-3">
-          {built ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-4 py-1.5 text-sm font-medium text-emerald-700">
-              <Check className="h-4 w-4" />
-              已部署上线
-            </span>
-          ) : (
-            <button
-              onClick={handleDeploy}
-              disabled={building}
-              className="inline-flex items-center gap-2 rounded-full bg-violet-600 px-6 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-50 transition"
-            >
-              {building ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  部署中...
-                </>
-              ) : (
-                <>
-                  <Globe className="h-4 w-4" />
-                  部署上线
-                </>
-              )}
-            </button>
-          )}
+          <button
+            onClick={() => setEditing(!editing)}
+            className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-4 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition"
+          >
+            <Edit3 className="h-3.5 w-3.5" />
+            {editing ? "完成编辑" : "编辑内容"}
+          </button>
+          <button
+            onClick={handleDeploy}
+            disabled={deployed}
+            className="inline-flex items-center gap-2 rounded-full bg-violet-600 px-6 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-50 transition"
+          >
+            {deployed ? (
+              <>
+                <Check className="h-4 w-4" />
+                已上线
+              </>
+            ) : (
+              <>
+                <Globe className="h-4 w-4" />
+                部署上线
+              </>
+            )}
+          </button>
         </div>
       </div>
 
       {/* Title */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">{site.name}</h1>
-        <p className="text-gray-500 text-sm mt-1">{site.description}</p>
-      </div>
+      <h1 className="text-2xl font-bold mb-6">{siteName}</h1>
 
-      {/* Website Preview — 模拟生成结果 */}
+      {/* Editor panel */}
+      {editing && (
+        <div className="rounded-xl border border-violet-200 bg-violet-50 p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Edit3 className="h-4 w-4 text-violet-600" />
+            <span className="text-sm font-semibold text-violet-800">编辑内容</span>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {Object.entries(editContent).map(([key, value]) => {
+              if (Array.isArray(value)) return null; // Skip arrays for now
+              return (
+                <div key={key}>
+                  <label className="block text-xs text-violet-700 mb-1">{key}</label>
+                  <input
+                    type="text"
+                    value={String(value)}
+                    onChange={(e) => setEditContent((prev) => ({ ...prev, [key]: e.target.value }))}
+                    className="w-full rounded-lg border border-violet-200 px-3 py-2 text-sm bg-white outline-none focus:border-violet-400"
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <button
+            onClick={() => setEditing(false)}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-violet-600 px-4 py-1.5 text-sm text-white hover:bg-violet-700 transition"
+          >
+            <Save className="h-3.5 w-3.5" />
+            保存
+          </button>
+        </div>
+      )}
+
+      {/* Website preview */}
       <div className="rounded-2xl border border-gray-200 overflow-hidden shadow-lg">
-        {/* Browser chrome */}
         <div className="flex items-center gap-2 border-b border-gray-200 bg-gray-50 px-4 py-3">
           <div className="flex gap-1.5">
             <div className="h-3 w-3 rounded-full bg-red-400" />
@@ -108,100 +276,38 @@ function PreviewContent() {
           </div>
           <div className="flex-1 mx-4">
             <div className="mx-auto max-w-md rounded-md bg-white px-3 py-1.5 text-xs text-gray-400 text-center border border-gray-100">
-              {site.name.toLowerCase().replace(/\s+/g, "-")}.aibuilder.app
+              {siteName.toLowerCase().replace(/\s+/g, "-")}.aibuilder.app
             </div>
           </div>
         </div>
-
-        {/* Preview content — 模拟网站展示 */}
-        <div className="bg-white">
-          {/* Hero Section */}
-          <div className="px-8 py-20 text-center" style={{ background: "linear-gradient(135deg, #7c3aed, #6d28d9)" }}>
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-4 py-1 text-xs text-white mb-6">
-              <Sparkles className="h-3 w-3" />
-              AI 自动生成
-            </div>
-            <h2 className="text-4xl font-bold text-white mb-4">{site.name}</h2>
-            <p className="text-white/80 max-w-lg mx-auto text-lg">
-              {site.description.length > 60
-                ? site.description.slice(0, 60) + "..."
-                : site.description}
-            </p>
-            <div className="mt-8 flex items-center justify-center gap-3">
-              <div className="rounded-full bg-white px-6 py-2.5 text-sm font-medium text-violet-700">
-                了解更多
-              </div>
-              <div className="rounded-full border border-white/30 px-6 py-2.5 text-sm font-medium text-white">
-                联系我们
-              </div>
-            </div>
-          </div>
-
-          {/* Features Section */}
-          <div className="px-8 py-16">
-            <h3 className="text-center text-2xl font-bold mb-10">核心优势</h3>
-            <div className="grid gap-6 sm:grid-cols-3">
-              {["专业设计", "响应式布局", "SEO 优化"].map((f, i) => (
-                <div key={i} className="rounded-xl border border-gray-100 p-6 text-center">
-                  <div className="mx-auto h-12 w-12 rounded-full bg-violet-100 flex items-center justify-center mb-4">
-                    <Sparkles className="h-5 w-5 text-violet-600" />
-                  </div>
-                  <h4 className="font-semibold mb-2">{f}</h4>
-                  <p className="text-sm text-gray-500">
-                    由 AI 自动生成的{f}，开箱即用
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Contact Section */}
-          <div className="bg-gray-50 px-8 py-16">
-            <h3 className="text-center text-2xl font-bold mb-6">联系我们</h3>
-            <div className="mx-auto max-w-md rounded-xl bg-white p-6 shadow-sm border border-gray-100">
-              <div className="space-y-4">
-                <div className="rounded-lg border border-gray-200 p-3 text-sm text-gray-400">
-                  您的姓名
-                </div>
-                <div className="rounded-lg border border-gray-200 p-3 text-sm text-gray-400">
-                  邮箱地址
-                </div>
-                <div className="rounded-lg border border-gray-200 p-3 text-sm text-gray-400 h-20">
-                  留言内容
-                </div>
-                <div className="rounded-lg bg-violet-600 p-3 text-center text-sm font-medium text-white">
-                  提交咨询
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="px-8 py-6 text-center text-sm text-gray-400">
-            © 2026 {site.name}. All rights reserved.
-          </div>
-        </div>
+        {renderPreview()}
       </div>
 
-      {/* Deployed URL */}
-      {built && (
+      {deployed && (
         <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center gap-3">
           <Check className="h-5 w-5 text-emerald-600" />
           <div className="flex-1">
             <p className="text-sm font-medium text-emerald-800">网站已上线</p>
             <p className="text-sm text-emerald-600 break-all">
-              https://{site.name.toLowerCase().replace(/\s+/g, "-")}.aibuilder.app
+              https://{siteName.toLowerCase().replace(/\s+/g, "-")}.aibuilder.app
             </p>
           </div>
-          <Link
-            href="/dashboard"
-            className="rounded-full bg-emerald-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-emerald-700 transition"
-          >
-            管理
-          </Link>
         </div>
       )}
     </div>
   );
 }
 
+export default function PreviewPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <Loader2 className="h-8 w-8 animate-spin text-violet-600" />
+        </div>
+      }
+    >
+      <PreviewContent />
+    </Suspense>
+  );
+}
