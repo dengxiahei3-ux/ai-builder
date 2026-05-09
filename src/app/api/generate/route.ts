@@ -1,27 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt, userId } = await request.json();
+    const { prompt } = await request.json();
 
     if (!prompt || typeof prompt !== "string") {
       return NextResponse.json({ error: "请输入需求描述" }, { status: 400 });
     }
-    if (!OPENAI_API_KEY) {
-      return NextResponse.json({ error: "AI 未配置，请联系管理员" }, { status: 500 });
+    if (!DEEPSEEK_API_KEY) {
+      return NextResponse.json({ error: "AI 未配置" }, { status: 500 });
     }
 
-    // 调 GPT-4o mini 生成网站
-    const completion = await fetch("https://api.openai.com/v1/chat/completions", {
+    const completion = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "deepseek-v4-flash",
         messages: [
           {
             role: "system",
@@ -57,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     if (!completion.ok) {
       const err = await completion.text();
-      console.error("OpenAI error:", err);
+      console.error("DeepSeek error:", err);
       return NextResponse.json({ error: "AI 生成失败" }, { status: 500 });
     }
 
@@ -68,7 +67,8 @@ export async function POST(request: NextRequest) {
     }
 
     // 解析 JSON
-    const site = JSON.parse(content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim());
+    const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    const site = JSON.parse(cleaned);
 
     return NextResponse.json({
       id: `site_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
