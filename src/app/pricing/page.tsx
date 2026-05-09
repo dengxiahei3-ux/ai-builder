@@ -52,6 +52,7 @@ export default function PricingPage() {
             ],
             href: CHECKOUT_URL + "?plan=pro",
             popular: false,
+            premium: true,
           },
         ].map((plan) => (
           <div
@@ -59,15 +60,21 @@ export default function PricingPage() {
             className={`rounded-2xl p-8 ${
               plan.popular
                 ? "bg-violet-600 text-white ring-4 ring-violet-200 scale-105 relative"
+                : plan.premium
+                ? "bg-gradient-to-br from-gray-900 to-gray-800 text-white border-2 border-amber-400/30 shadow-xl relative overflow-hidden"
                 : "bg-gradient-to-b from-white to-gray-50/50 border border-gray-200 dark:bg-white"
             }`}
           >
+            {plan.premise && <div className="absolute top-0 right-0 w-24 h-24 bg-amber-400/10 rounded-bl-full" />}
+            {plan.premium && (
+              <div className="absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-br from-amber-400/20 to-transparent rounded-full blur-xl" />
+            )}
             {plan.popular && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex rounded-full bg-violet-800 px-4 py-1 text-xs font-medium text-white">
                 最受欢迎
               </div>
             )}
-            <h3 className={`text-lg font-semibold ${plan.popular ? "" : "text-gray-900"}`}>
+            <h3 className={`text-lg font-semibold ${plan.popular ? "" : plan.premium ? "text-white" : "text-gray-900"}`}>
               {plan.name}
             </h3>
             <div className="mt-4 flex items-baseline gap-1">
@@ -79,7 +86,7 @@ export default function PricingPage() {
               {plan.features.map((f) => (
                 <li key={f} className="flex items-start gap-2 text-sm">
                   <svg
-                    className={`h-4 w-4 mt-0.5 flex-shrink-0 ${plan.popular ? "text-white" : "text-violet-600"}`}
+                    className={`h-4 w-4 mt-0.5 flex-shrink-0 ${plan.popular ? "text-white" : plan.premium ? "text-amber-400" : "text-violet-600"}`}
                     fill="none" viewBox="0 0 24 24" stroke="currentColor"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -102,6 +109,8 @@ export default function PricingPage() {
                 className={`mt-8 block w-full rounded-full py-2.5 text-center text-sm font-medium transition ${
                   plan.popular
                     ? "bg-white text-violet-700 hover:bg-gray-100"
+                    : plan.premium
+                    ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 shadow-lg"
                     : "border border-gray-300 text-gray-700 hover:bg-gray-50"
                 }`}
               >
