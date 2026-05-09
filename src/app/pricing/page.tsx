@@ -6,7 +6,7 @@ export default function PricingPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
       <div className="text-center mb-16">
-        <h1 className="text-3xl font-bold">简单透明的定价</h1>
+        <h1 className="text-3xl font-bold">简单透明的会员</h1>
         <p className="mt-3 text-gray-600 max-w-lg mx-auto">
           无隐藏费用，随时取消。所有套餐均含 AI 生成功能
         </p>
@@ -59,7 +59,7 @@ export default function PricingPage() {
             className={`rounded-2xl p-8 ${
               plan.popular
                 ? "bg-violet-600 text-white ring-4 ring-violet-200 scale-105 relative"
-                : "bg-white border border-gray-200 dark:bg-white"
+                : "bg-gradient-to-b from-white to-gray-50/50 border border-gray-200 dark:bg-white"
             }`}
           >
             {plan.popular && (

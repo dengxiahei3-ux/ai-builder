@@ -39,7 +39,7 @@ export default function Home() {
               href="/pricing"
               className="rounded-full border border-gray-300 px-8 py-3.5 text-base font-medium text-gray-700 hover:bg-gray-50 transition"
             >
-              查看定价
+              查看会员
             </Link>
           </div>
           <p className="mt-4 text-sm text-gray-400">无需信用卡 · 30秒生成 · 一键部署上线</p>

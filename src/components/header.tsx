@@ -44,7 +44,7 @@ export default function Header() {
         <nav className="hidden md:flex items-center gap-8 text-sm text-gray-600">
           <Link href="/" className="hover:text-gray-900 transition">首页</Link>
           <Link href="/create" className="hover:text-gray-900 transition">创建网站</Link>
-          <Link href="/pricing" className="hover:text-gray-900 transition">定价</Link>
+          <Link href="/pricing" className="hover:text-gray-900 transition">会员</Link>
           <Link href="/dashboard" className="hover:text-gray-900 transition">我的网站</Link>
         </nav>
 
@@ -96,7 +96,7 @@ export default function Header() {
         <div className="md:hidden border-t border-gray-100 bg-white px-4 py-4 space-y-3">
           <Link href="/" className="block text-sm" onClick={() => setOpen(false)}>首页</Link>
           <Link href="/create" className="block text-sm" onClick={() => setOpen(false)}>创建网站</Link>
-          <Link href="/pricing" className="block text-sm" onClick={() => setOpen(false)}>定价</Link>
+          <Link href="/pricing" className="block text-sm" onClick={() => setOpen(false)}>会员</Link>
           <Link href="/dashboard" className="block text-sm" onClick={() => setOpen(false)}>我的网站</Link>
 
           {user ? (
