@@ -107,6 +107,12 @@ export default function Dashboard() {
                   >
                     编辑
                   </Link>
+                  <Link
+                    href={`/dashboard/sites/${site.id}`}
+                    className="inline-flex items-center gap-1 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition"
+                  >
+                    设置
+                  </Link>
                 </div>
               </div>
             </div>
