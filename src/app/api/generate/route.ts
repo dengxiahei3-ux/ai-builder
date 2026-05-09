@@ -2,6 +2,52 @@ import { NextRequest, NextResponse } from "next/server";
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
+const SYSTEM_PROMPT = `你是专业的网站设计师和前端工程师。
+根据用户的需求，输出一个 **双语 JSON** 格式的网站蓝图。
+每个文本字段都包含中文(zh)和英文(en)两个版本。
+
+输出格式：
+{
+  "name": {
+    "zh": "中文网站名",
+    "en": "English Site Name"
+  },
+  "style": "设计风格",
+  "theme": { "primary": "#主色", "secondary": "#辅色" },
+  "pages": [
+    {
+      "slug": "home",
+      "title": { "zh": "首页", "en": "Home" },
+      "sections": [
+        {
+          "type": "hero",
+          "content": {
+            "zh": { "title": "中文标题", "subtitle": "中文副标题", "cta": "按钮" },
+            "en": { "title": "English Title", "subtitle": "English Subtitle", "cta": "Get Started" }
+          }
+        },
+        {
+          "type": "features",
+          "content": {
+            "zh": { "items": ["特点1", "特点2", "特点3"] },
+            "en": { "items": ["Feature 1", "Feature 2", "Feature 3"] }
+          }
+        },
+        {
+          "type": "contact",
+          "content": {
+            "zh": { "title": "联系我们", "email": "info@example.com" },
+            "en": { "title": "Contact Us", "email": "info@example.com" }
+          }
+        }
+      ]
+    }
+  ]
+}
+
+注意：邮箱、电话号码等不变的内容不需要双语。
+只输出 JSON，不要其他文字。`;
+
 export async function POST(request: NextRequest) {
   try {
     const { prompt } = await request.json();
@@ -22,35 +68,11 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model: "deepseek-v4-flash",
         messages: [
-          {
-            role: "system",
-            content: `你是专业的网站设计师和前端工程师。
-根据用户的需求，输出一个 JSON 格式的网站蓝图。
-
-输出格式：
-{
-  "name": "网站名称",
-  "style": "设计风格描述",
-  "theme": { "primary": "#主色", "secondary": "#辅色" },
-  "pages": [
-    {
-      "slug": "home",
-      "title": "首页",
-      "sections": [
-        { "type": "hero", "content": { "title": "主标题", "subtitle": "副标题", "cta": "按钮文字" } },
-        { "type": "features", "content": { "items": ["特点1", "特点2", "特点3"] } },
-        { "type": "contact", "content": { "title": "联系我们" } }
-      ]
-    }
-  ]
-}
-
-只输出 JSON，不要其他文字。`,
-          },
+          { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: prompt },
         ],
         temperature: 0.7,
-        max_tokens: 1000,
+        max_tokens: 1500,
       }),
     });
 
@@ -66,7 +88,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "AI 返回为空" }, { status: 500 });
     }
 
-    // 解析 JSON
     const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
     const site = JSON.parse(cleaned);
 

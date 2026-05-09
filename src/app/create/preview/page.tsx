@@ -5,7 +5,7 @@ import { Suspense, useEffect, useState } from "react";
 import { getSites } from "@/lib/site-store";
 import { getTemplate, type Template, type TemplatePage } from "@/lib/templates";
 import Link from "next/link";
-import { ArrowLeft, Check, Edit3, Loader2, Save, Globe } from "lucide-react";
+import { ArrowLeft, Check, Edit3, Loader2, Save, Globe, Languages } from "lucide-react";
 
 function PreviewContent() {
   const searchParams = useSearchParams();
@@ -16,6 +16,8 @@ function PreviewContent() {
   const [siteName, setSiteName] = useState("");
   const [editing, setEditing] = useState(false);
   const [deployed, setDeployed] = useState(false);
+  const [lang, setLang] = useState("zh");
+  const [aiData, setAiData] = useState<any>(null);
   const [editContent, setEditContent] = useState<Record<string, any>>({});
 
   useEffect(() => {
@@ -28,12 +30,18 @@ function PreviewContent() {
       const t = getTemplate(templateId);
       if (t) {
         setTemplate(t);
-        // 初始化可编辑内容
         const initContent: Record<string, any> = {};
         t.pages.forEach((page) => {
           Object.assign(initContent, page.content);
         });
         setEditContent(initContent);
+      }
+    } else if (id) {
+      // 加载 AI 生成的数据
+      const stored = localStorage.getItem(`ai_site_${id}`);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setAiData(parsed);
       }
     }
   }, [id, templateId]);
@@ -210,6 +218,15 @@ function PreviewContent() {
             <Edit3 className="h-3.5 w-3.5" />
             {editing ? "完成编辑" : "编辑内容"}
           </button>
+          {aiData && (
+            <button
+              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+              className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-4 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition"
+            >
+              <Languages className="h-3.5 w-3.5" />
+              {lang === 'zh' ? 'English' : '中文'}
+            </button>
+          )}
           <button
             onClick={handleDeploy}
             disabled={deployed}
@@ -280,7 +297,7 @@ function PreviewContent() {
             </div>
           </div>
         </div>
-        {renderPreview()}
+        {template ? renderPreview() : (aiData && <RenderAISite data={aiData} lang={lang} />)}
       </div>
 
       {deployed && (
@@ -294,6 +311,94 @@ function PreviewContent() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function RenderAISite({ data, lang }: { data: any; lang: string }) {
+  const t = (obj: any) => {
+    if (!obj) return '';
+    if (typeof obj === 'string') return obj;
+    return obj[lang] || obj.en || obj.zh || '';
+  };
+
+  const theme = data.theme || {};
+  const pages = data.pages || [];
+  const homePage = pages[0] || {};
+  const sections = homePage.sections || [];
+
+  return (
+    <div>
+      {/* Hero */}
+      {sections.filter((s: any) => s.type === 'hero').map((s: any, i: number) => {
+        const c = s.content;
+        return (
+          <div key={i} className="px-8 py-20 text-center" style={{background: 'linear-gradient(135deg, ' + (theme.primary || '#7c3aed') + ', ' + (theme.secondary || '#6d28d9') + ')'}}>
+            <h2 className="text-4xl font-bold text-white mb-4">{t(c?.title)}</h2>
+            <p className="text-white/80 max-w-lg mx-auto text-lg">{t(c?.subtitle)}</p>
+            {c?.cta && <div className="mt-8 inline-flex rounded-full bg-white px-6 py-2.5 text-sm font-medium" style={{color: theme.primary || '#7c3aed'}}>{t(c?.cta)}</div>}
+          </div>
+        );
+      })}
+
+      {/* Features */}
+      {sections.filter((s: any) => s.type === 'features' || s.type === 'services').map((s: any, i: number) => {
+        const c = s.content;
+        const items = c?.items || [];
+        return (
+          <div key={i} className="px-8 py-16">
+            <h3 className="text-center text-2xl font-bold mb-10">{t(c?.title) || '核心优势'}</h3>
+            <div className="grid gap-6 sm:grid-cols-3 max-w-3xl mx-auto">
+              {(Array.isArray(items) ? items : typeof items === 'object' ? (items[lang] || items.en || items.zh || []) : []).map((item: string, j: number) => (
+                <div key={j} className="rounded-xl border border-gray-100 p-6 text-center">
+                  <div className="mx-auto h-12 w-12 rounded-full bg-violet-100 flex items-center justify-center mb-4">
+                    <span className="text-lg">{['⭐','🔥','💡'][j] || '✓'}</span>
+                  </div>
+                  <h4 className="font-semibold">{typeof item === 'object' ? t(item) : item}</h4>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
+      {/* About/Bio */}
+      {sections.filter((s: any) => s.type === 'about' || s.type === 'bio').map((s: any, i: number) => {
+        const c = s.content;
+        return (
+          <div key={i} className="bg-gray-50 px-8 py-16 text-center">
+            <h3 className="text-2xl font-bold mb-4">{t(c?.title) || '关于我们'}</h3>
+            <p className="text-gray-500 max-w-lg mx-auto">{t(c?.description)}</p>
+          </div>
+        );
+      })}
+
+      {/* Quote */}
+      {sections.filter((s: any) => s.type === 'quote').map((s: any, i: number) => {
+        const c = s.content;
+        return (
+          <div key={i} className="px-8 py-12 text-center italic text-gray-500">
+            <p className="text-lg">"{t(c?.text)}"</p>
+            {c?.author && <p className="mt-2 text-sm">— {t(c?.author)}</p>}
+          </div>
+        );
+      })}
+
+      {/* Contact */}
+      {sections.filter((s: any) => s.type === 'contact' || s.type === 'contact-form').map((s: any, i: number) => {
+        const c = s.content;
+        return (
+          <div key={i} className="px-8 py-16 text-center bg-gray-50">
+            <h3 className="text-2xl font-bold mb-6">{t(c?.title) || (lang === 'zh' ? '联系我们' : 'Contact Us')}</h3>
+            {c?.email && <p className="text-gray-500">{c.email}</p>}
+          </div>
+        );
+      })}
+
+      {/* Footer */}
+      <div className="px-8 py-4 text-center text-xs text-gray-400 border-t border-gray-100">
+        <p>&copy; 2026 {typeof data.name === 'object' ? t(data.name) : data.name}</p>
+      </div>
     </div>
   );
 }

@@ -49,12 +49,14 @@ export default function CreatePage() {
       const id = `site_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`;
       addSite({
         id,
-        name: data.name || "未命名网站",
+        name: typeof data.name === 'object' ? data.name.zh || data.name.en : data.name,
         description: prompt.trim(),
         createdAt: new Date().toISOString(),
         status: "draft",
         leads: 0,
       });
+      // 存 AI 生成的完整数据到 localStorage
+      localStorage.setItem(`ai_site_${id}`, JSON.stringify(data));
       router.push(`/create/preview?id=${id}`);
     } catch (e) {
       setError("网络错误，请重试");
