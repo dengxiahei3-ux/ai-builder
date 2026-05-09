@@ -123,7 +123,7 @@ export default function CreatePage() {
               onChange={(e) => setPrompt(e.target.value)}
               placeholder="例如：帮我做一个科技公司的官网，深蓝色主题，要有首页、产品展示、关于我们..."
               rows={4}
-              className="w-full resize-none rounded-xl border border-gray-200 p-4 text-sm outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition"
+              className="w-full resize-none rounded-xl border border-gray-200 p-4 text-sm text-gray-900 placeholder-gray-400 bg-white outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition"
               disabled={loading}
             />
             <div className="mt-4 flex items-center justify-between">
@@ -179,7 +179,7 @@ export default function CreatePage() {
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}
             placeholder="输入你的网站名称"
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-violet-400 mb-6 transition"
+            className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 bg-white outline-none focus:border-violet-400 mb-6 transition"
           />
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
