@@ -61,13 +61,13 @@ export default function PricingPage() {
               plan.popular
                 ? "bg-violet-600 text-white ring-4 ring-violet-200 scale-105 relative"
                 : plan.premium
-                ? "bg-gradient-to-br from-amber-900 via-amber-800 to-yellow-900 text-white border-2 border-amber-400/40 shadow-2xl shadow-amber-900/30 relative overflow-hidden"
-                : "bg-gradient-to-br from-orange-100 to-amber-100 border border-orange-200"
+                ? "bg-gradient-to-br from-indigo-900 via-indigo-800 to-violet-900 text-white border-2 border-violet-400/30 shadow-2xl shadow-violet-900/30 relative overflow-hidden"
+                : "bg-gradient-to-br from-slate-50 to-indigo-50 border border-indigo-100"
             }`}
           >
             {plan.premium && <div className="absolute top-0 right-0 w-24 h-24 bg-amber-400/10 rounded-bl-full" />}
             {plan.premium && (
-              <div className="absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-br from-amber-400/20 to-transparent rounded-full blur-xl" />
+              <div className="absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-br from-violet-400/20 to-transparent rounded-full blur-xl" />
             )}
             {plan.popular && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex rounded-full bg-violet-800 px-4 py-1 text-xs font-medium text-white">
@@ -86,7 +86,7 @@ export default function PricingPage() {
               {plan.features.map((f) => (
                 <li key={f} className="flex items-start gap-2 text-sm">
                   <svg
-                    className={`h-4 w-4 mt-0.5 flex-shrink-0 ${plan.popular ? "text-white" : plan.premium ? "text-amber-400" : "text-violet-600"}`}
+                    className={`h-4 w-4 mt-0.5 flex-shrink-0 ${plan.popular ? "text-white" : plan.premium ? "text-violet-300" : "text-violet-600"}`}
                     fill="none" viewBox="0 0 24 24" stroke="currentColor"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -110,7 +110,7 @@ export default function PricingPage() {
                   plan.popular
                     ? "bg-white text-violet-700 hover:bg-gray-100"
                     : plan.premium
-                    ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 shadow-lg"
+                    ? "bg-gradient-to-r from-indigo-500 to-violet-600 text-white hover:from-indigo-600 hover:to-violet-700 shadow-lg"
                     : "border border-gray-300 text-gray-700 hover:bg-gray-50"
                 }`}
               >
