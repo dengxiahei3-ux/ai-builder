@@ -1,0 +1,128 @@
+import Link from "next/link";
+
+export default function PricingPage() {
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+      <div className="text-center mb-16">
+        <h1 className="text-3xl font-bold">简单透明的定价</h1>
+        <p className="mt-3 text-gray-500 max-w-lg mx-auto">
+          无隐藏费用，随时取消。所有套餐均含 AI 生成功能
+        </p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3 max-w-4xl mx-auto">
+        {[
+          {
+            name: "免费",
+            price: "¥0",
+            period: "",
+            features: ["1 个网站", "子域名（xxx.aibuilder.app）", "1 个页面", "基础模板", "社区支持"],
+            cta: "免费开始",
+            popular: false,
+          },
+          {
+            name: "基础版",
+            price: "¥29",
+            period: "/月",
+            features: [
+              "1 个网站",
+              "自定义域名",
+              "最多 5 个页面",
+              "询盘表单收集",
+              "邮件通知",
+              "基础 SEO 优化",
+              "标准支持",
+            ],
+            cta: "订阅基础版",
+            popular: true,
+          },
+          {
+            name: "专业版",
+            price: "¥79",
+            period: "/月",
+            features: [
+              "3 个网站",
+              "自定义域名",
+              "无限页面",
+              "询盘表单收集",
+              "邮件 + 微信通知",
+              "高级 SEO 优化",
+              "数据统计看板",
+              "优先支持",
+            ],
+            cta: "订阅专业版",
+            popular: false,
+          },
+        ].map((plan) => (
+          <div
+            key={plan.name}
+            className={`rounded-2xl p-8 ${
+              plan.popular
+                ? "bg-violet-600 text-white ring-4 ring-violet-200 scale-105 relative"
+                : "bg-white border border-gray-200"
+            }`}
+          >
+            {plan.popular && (
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex rounded-full bg-violet-800 px-4 py-1 text-xs font-medium text-white">
+                最受欢迎
+              </div>
+            )}
+            <h3 className={`text-lg font-semibold ${plan.popular ? "" : "text-gray-900"}`}>
+              {plan.name}
+            </h3>
+            <div className="mt-4 flex items-baseline gap-1">
+              <span className="text-4xl font-bold">{plan.price}</span>
+              <span className={plan.popular ? "text-white/70" : "text-gray-400"}>{plan.period}</span>
+            </div>
+
+            <ul className="mt-6 space-y-3">
+              {plan.features.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm">
+                  <svg
+                    className={`h-4 w-4 mt-0.5 flex-shrink-0 ${plan.popular ? "text-white" : "text-violet-600"}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {f}
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              href="/create"
+              className={`mt-8 block w-full rounded-full py-2.5 text-center text-sm font-medium transition ${
+                plan.popular
+                  ? "bg-white text-violet-700 hover:bg-gray-100"
+                  : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              {plan.cta}
+            </Link>
+          </div>
+        ))}
+      </div>
+
+      {/* FAQ */}
+      <div className="mt-20 max-w-2xl mx-auto">
+        <h2 className="text-xl font-bold text-center mb-8">常见问题</h2>
+        <div className="space-y-6">
+          {[
+            { q: "需要会写代码吗？", a: "完全不需要。用中文描述需求，AI 自动生成完整网站。" },
+            { q: "可以绑定自己的域名吗？", a: "基础版及以上支持绑定自定义域名，免费版使用子域名。" },
+            { q: "生成后还能修改吗？", a: "可以。支持重新生成、在线编辑文字和图片。" },
+            { q: "询盘表单怎么用？", a: "自动生成联系表单，客户提交的信息会通过邮件/微信通知你。" },
+            { q: "可以随时取消吗？", a: "是的。随时取消订阅，已生成的网站继续保留。" },
+          ].map(({ q, a }) => (
+            <div key={q}>
+              <h3 className="font-semibold text-sm mb-1">{q}</h3>
+              <p className="text-sm text-gray-500">{a}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
