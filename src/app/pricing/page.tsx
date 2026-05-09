@@ -65,7 +65,7 @@ export default function PricingPage() {
                 : "bg-gradient-to-b from-white to-gray-50/50 border border-gray-200 dark:bg-white"
             }`}
           >
-            {plan.premise && <div className="absolute top-0 right-0 w-24 h-24 bg-amber-400/10 rounded-bl-full" />}
+            {plan.premium && <div className="absolute top-0 right-0 w-24 h-24 bg-amber-400/10 rounded-bl-full" />}
             {plan.premium && (
               <div className="absolute -top-8 -right-8 w-32 h-32 bg-gradient-to-br from-amber-400/20 to-transparent rounded-full blur-xl" />
             )}
