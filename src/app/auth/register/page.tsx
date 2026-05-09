@@ -21,7 +21,7 @@ export default function RegisterPage() {
     setLoading(true);
     setError("");
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -35,8 +35,16 @@ export default function RegisterPage() {
     if (error) {
       setError(error.message);
       setLoading(false);
-    } else {
-      setRegistered(true);
+    } else if (data?.user?.id) {
+      // 自动确认用户（服务端）
+      try {
+        await fetch("/api/confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: data.user.id }),
+        });
+      } catch (_) {}
+      router.push("/auth/login?confirmed=true");
     }
   }
 

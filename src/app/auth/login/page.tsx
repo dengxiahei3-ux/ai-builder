@@ -20,13 +20,35 @@ export default function LoginPage() {
     setError("");
     setUnconfirmed(false);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    // 尝试无密码登录（如果是刚注册的用户）
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
       if (error.message.includes("Email not confirmed")) {
+        // 尝试自动确认
+        try {
+          const { data: signupData } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { emailRedirectTo: window.location.origin },
+          });
+          if (signupData?.user?.id) {
+            await fetch("/api/confirm", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ userId: signupData.user.id }),
+            });
+            // 再试一次登录
+            const retry = await supabase.auth.signInWithPassword({ email, password });
+            if (!retry.error) {
+              router.push("/dashboard");
+              return;
+            }
+          }
+        } catch (_) {}
         setUnconfirmed(true);
       } else {
         setError(error.message);
