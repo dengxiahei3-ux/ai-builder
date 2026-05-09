@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+const CHECKOUT_URL = "https://ai-builder.lemonsqueezy.com/checkout/buy/ee614ea7-4646-45a4-a04c-873a45d17053";
+
 export default function PricingPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
@@ -16,41 +18,39 @@ export default function PricingPage() {
             name: "免费",
             price: "¥0",
             period: "",
-            features: ["1 个网站", "子域名（xxx.aibuilder.app）", "1 个页面", "基础模板", "社区支持"],
-            cta: "免费开始",
+            features: ["1 个网站", "子域名", "1 个页面", "基础模板"],
+            href: "/create",
             popular: false,
           },
           {
             name: "基础版",
-            price: "¥29",
-            period: "/月",
+            price: "¥36",
+            period: "/月（$5）",
             features: [
               "1 个网站",
               "自定义域名",
               "最多 5 个页面",
-              "询盘表单收集",
+              "AI 自动生成",
+              "询盘表单",
               "邮件通知",
-              "基础 SEO 优化",
-              "标准支持",
             ],
-            cta: "订阅基础版",
+            href: CHECKOUT_URL,
             popular: true,
           },
           {
             name: "专业版",
-            price: "¥79",
-            period: "/月",
+            price: "¥99",
+            period: "/月（$14）",
             features: [
               "3 个网站",
               "自定义域名",
               "无限页面",
-              "询盘表单收集",
-              "邮件 + 微信通知",
-              "高级 SEO 优化",
-              "数据统计看板",
+              "AI 自动生成",
+              "询盘表单 + 微信通知",
+              "数据统计",
               "优先支持",
             ],
-            cta: "订阅专业版",
+            href: CHECKOUT_URL + "?plan=pro",
             popular: false,
           },
         ].map((plan) => (
@@ -80,9 +80,7 @@ export default function PricingPage() {
                 <li key={f} className="flex items-start gap-2 text-sm">
                   <svg
                     className={`h-4 w-4 mt-0.5 flex-shrink-0 ${plan.popular ? "text-white" : "text-violet-600"}`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -91,30 +89,41 @@ export default function PricingPage() {
               ))}
             </ul>
 
-            <Link
-              href="/create"
-              className={`mt-8 block w-full rounded-full py-2.5 text-center text-sm font-medium transition ${
-                plan.popular
-                  ? "bg-white text-violet-700 hover:bg-gray-100"
-                  : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              {plan.cta}
-            </Link>
+            {plan.name === "免费" ? (
+              <Link href="/create"
+                className="mt-8 block w-full rounded-full py-2.5 text-center text-sm font-medium transition border border-gray-300 text-gray-700 hover:bg-gray-50">
+                免费开始
+              </Link>
+            ) : (
+              <a
+                href={plan.href}
+                target="_blank"
+                rel="noreferrer"
+                className={`mt-8 block w-full rounded-full py-2.5 text-center text-sm font-medium transition ${
+                  plan.popular
+                    ? "bg-white text-violet-700 hover:bg-gray-100"
+                    : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                立即订阅
+              </a>
+            )}
           </div>
         ))}
       </div>
 
-      {/* FAQ */}
+      <p className="text-center text-sm text-gray-400 mt-8">
+        支付由 Lemon Squeezy 安全处理。支持信用卡、支付宝等。
+      </p>
+
       <div className="mt-20 max-w-2xl mx-auto">
         <h2 className="text-xl font-bold text-center mb-8">常见问题</h2>
         <div className="space-y-6">
           {[
             { q: "需要会写代码吗？", a: "完全不需要。用中文描述需求，AI 自动生成完整网站。" },
-            { q: "可以绑定自己的域名吗？", a: "基础版及以上支持绑定自定义域名，免费版使用子域名。" },
-            { q: "生成后还能修改吗？", a: "可以。支持重新生成、在线编辑文字和图片。" },
-            { q: "询盘表单怎么用？", a: "自动生成联系表单，客户提交的信息会通过邮件/微信通知你。" },
-            { q: "可以随时取消吗？", a: "是的。随时取消订阅，已生成的网站继续保留。" },
+            { q: "可以绑定自己的域名吗？", a: "基础版及以上支持绑定自定义域名。" },
+            { q: "AI 生成需要额外付费吗？", a: "不需要，订阅费用已包含 AI 生成。" },
+            { q: "可以随时取消吗？", a: "是的，随时取消订阅，已生成的网站继续保留。" },
           ].map(({ q, a }) => (
             <div key={q}>
               <h3 className="font-semibold text-sm mb-1">{q}</h3>
