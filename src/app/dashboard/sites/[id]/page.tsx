@@ -193,7 +193,7 @@ export default function SiteSettings() {
             {/* 自定义域名 — 付费功能 */}
             <div className="rounded-xl border border-gray-100 p-4">
               <div className="flex items-center gap-2 mb-1">
-                <Globe className="h-4 w-4 text-gray-400" />
+                <Globe className="h-4 w-4 text-gray-500" />
                 <span className="text-sm text-gray-500">自定义域名</span>
                 {plan === "free" && <span className="text-xs rounded-full bg-amber-100 text-amber-700 px-2 py-0.5">付费功能</span>}
               </div>
@@ -203,7 +203,7 @@ export default function SiteSettings() {
                     type="text"
                     value="your-site.aibuilder.app"
                     disabled
-                    className="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-400 cursor-not-allowed"
+                    className="w-full rounded-xl border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-500 cursor-not-allowed"
                   />
                   <a href={CHECKOUT_URL} target="_blank" rel="noreferrer"
                     className="mt-2 inline-flex items-center gap-1 text-sm text-violet-600 hover:underline"
@@ -248,7 +248,7 @@ export default function SiteSettings() {
             ))}
           </div>
           <div className="mt-4 rounded-xl border border-gray-100 p-4">
-            <p className="text-xs text-gray-400 mb-2">预览</p>
+            <p className="text-xs text-gray-500 mb-2">预览</p>
             <div className="flex gap-2">
               <div className="rounded-lg px-4 py-2 text-sm text-white" style={{ backgroundColor: theme.primary }}>
                 主按钮
@@ -266,7 +266,7 @@ export default function SiteSettings() {
             <Settings className="h-5 w-5 text-violet-600" />
             <h2 className="text-lg font-semibold">页面模块</h2>
           </div>
-          <p className="text-sm text-gray-400 mb-4">选择要在网站中显示的模块</p>
+          <p className="text-sm text-gray-500 mb-4">选择要在网站中显示的模块</p>
           <div className="space-y-3">
             {[
               { key: "hero", label: "首页大图/标题", desc: "网站最顶部的主视觉区域" },
@@ -278,7 +278,7 @@ export default function SiteSettings() {
               <label key={key} className="flex items-center justify-between rounded-xl border border-gray-100 p-4 hover:bg-gray-50 transition cursor-pointer">
                 <div>
                   <p className="text-sm font-medium">{label}</p>
-                  <p className="text-xs text-gray-400">{desc}</p>
+                  <p className="text-xs text-gray-500">{desc}</p>
                 </div>
                 <div
                   onClick={() => setSections((prev) => ({ ...prev, [key]: !prev[key as keyof typeof sections] }))}
@@ -317,7 +317,7 @@ export default function SiteSettings() {
                 <div key={mod.id} className="rounded-xl border border-amber-100 bg-white p-4">
                   <div className="flex items-start gap-3">
                     <div className="h-9 w-9 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                      <Icon className="h-4 w-4 text-gray-400" />
+                      <Icon className="h-4 w-4 text-gray-500" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
@@ -326,7 +326,7 @@ export default function SiteSettings() {
                           {mod.price}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-400">{mod.desc}</p>
+                      <p className="text-xs text-gray-500">{mod.desc}</p>
                     </div>
                   </div>
                 </div>
@@ -345,7 +345,7 @@ export default function SiteSettings() {
                 <Crown className="h-4 w-4" />
                 升级基础版 — ¥36/月
               </a>
-              <p className="text-xs text-gray-400 mt-2">解锁自定义域名 + SEO + 更多页面</p>
+              <p className="text-xs text-gray-500 mt-2">解锁自定义域名 + SEO + 更多页面</p>
             </div>
           )}
         </div>
@@ -358,7 +358,7 @@ export default function SiteSettings() {
           </div>
           <div className="rounded-xl border border-dashed border-gray-300 p-8 text-center">
             <MessageSquare className="mx-auto h-8 w-8 text-gray-300 mb-2" />
-            <p className="text-sm text-gray-400">等待客户留言...</p>
+            <p className="text-sm text-gray-500">等待客户留言...</p>
           </div>
         </div>
       </div>

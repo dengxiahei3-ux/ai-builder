@@ -7,7 +7,7 @@ export default function PricingPage() {
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
       <div className="text-center mb-16">
         <h1 className="text-3xl font-bold">简单透明的定价</h1>
-        <p className="mt-3 text-gray-500 max-w-lg mx-auto">
+        <p className="mt-3 text-gray-600 max-w-lg mx-auto">
           无隐藏费用，随时取消。所有套餐均含 AI 生成功能
         </p>
       </div>
@@ -59,7 +59,7 @@ export default function PricingPage() {
             className={`rounded-2xl p-8 ${
               plan.popular
                 ? "bg-violet-600 text-white ring-4 ring-violet-200 scale-105 relative"
-                : "bg-white border border-gray-200"
+                : "bg-white border border-gray-200 dark:bg-white"
             }`}
           >
             {plan.popular && (
@@ -72,7 +72,7 @@ export default function PricingPage() {
             </h3>
             <div className="mt-4 flex items-baseline gap-1">
               <span className="text-4xl font-bold">{plan.price}</span>
-              <span className={plan.popular ? "text-white/70" : "text-gray-400"}>{plan.period}</span>
+              <span className={plan.popular ? "text-white/70" : "text-gray-500"}>{plan.period}</span>
             </div>
 
             <ul className="mt-6 space-y-3">
@@ -127,7 +127,7 @@ export default function PricingPage() {
           ].map(({ q, a }) => (
             <div key={q}>
               <h3 className="font-semibold text-sm mb-1">{q}</h3>
-              <p className="text-sm text-gray-500">{a}</p>
+              <p className="text-sm text-gray-600">{a}</p>
             </div>
           ))}
         </div>
