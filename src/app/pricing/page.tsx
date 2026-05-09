@@ -62,7 +62,7 @@ export default function PricingPage() {
                 ? "bg-violet-600 text-white ring-4 ring-violet-200 scale-105 relative"
                 : plan.premium
                 ? "bg-gradient-to-br from-amber-900 via-amber-800 to-yellow-900 text-white border-2 border-amber-400/40 shadow-2xl shadow-amber-900/30 relative overflow-hidden"
-                : "bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200"
+                : "bg-gradient-to-br from-orange-100 to-amber-100 border border-orange-200"
             }`}
           >
             {plan.premium && <div className="absolute top-0 right-0 w-24 h-24 bg-amber-400/10 rounded-bl-full" />}
