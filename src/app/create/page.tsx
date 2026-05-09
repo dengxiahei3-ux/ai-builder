@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, ArrowRight, Loader2, MessageSquare, Plus, Grid } from "lucide-react";
+import { Sparkles, ArrowRight, Loader2, MessageSquare, Plus, Grid, Crown, Zap } from "lucide-react";
 import { getTemplates } from "@/lib/templates";
 import { addSite } from "@/lib/site-store";
+import { useAiUsage } from "@/lib/ai-usage";
+const CHECKOUT_URL = "https://ai-builder.lemonsqueezy.com/checkout/buy/ee614ea7-4646-45a4-a04c-873a45d17053";
 
 const EXAMPLES = [
   "帮我做一个摄影作品集网站，暗黑风格，大图展示",
@@ -19,6 +21,7 @@ export default function CreatePage() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const aiUsage = useAiUsage();
 
   // Template mode
   const templates = getTemplates();
@@ -28,6 +31,10 @@ export default function CreatePage() {
   // AI mode
   async function handleAiGenerate() {
     if (!prompt.trim()) return;
+    if (!aiUsage.canGenerate()) {
+      setError("免费次数已用完，升级后无限使用");
+      return;
+    }
     setLoading(true);
     setError("");
 
@@ -39,6 +46,7 @@ export default function CreatePage() {
       });
 
       const data = await res.json();
+      aiUsage.increment();
 
       if (!res.ok) {
         setError(data.error || "生成失败");
@@ -151,6 +159,28 @@ export default function CreatePage() {
             {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
           </div>
 
+          {/* 剩余次数提示 */}
+          {aiUsage.remaining() > 0 && aiUsage.remaining() < 5 && (
+            <div className="mt-4 flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-4 py-2.5">
+              <Zap className="h-4 w-4 text-amber-600" />
+              <span className="text-sm text-amber-700">
+                免费剩余 <strong>{aiUsage.remaining()}</strong> 次
+              </span>
+              <a href={CHECKOUT_URL} target="_blank" rel="noreferrer" className="ml-auto text-sm font-medium text-amber-700 underline">
+                升级无限使用
+              </a>
+            </div>
+          )}
+          {aiUsage.remaining() === 0 && (
+            <div className="mt-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3">
+              <p className="text-sm text-red-700">
+                免费次数已用完。
+                <a href={CHECKOUT_URL} target="_blank" rel="noreferrer" className="font-medium underline ml-1">
+                  升级后无限使用 →
+                </a>
+              </p>
+            </div>
+          )}
           {/* 示例需求 */}
           <div className="mt-8">
             <h2 className="text-sm font-medium text-gray-500 mb-3">试试说这些：</h2>
@@ -195,6 +225,12 @@ export default function CreatePage() {
                     : "border-gray-200 bg-white"
                 }`}
               >
+                {(t.id === "ecommerce" || t.id === "landing") && (
+                  <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5">
+                    <Crown className="h-3 w-3 text-amber-600" />
+                    <span className="text-xs font-medium text-amber-700">专业版</span>
+                  </div>
+                )}
                 <div className="text-3xl mb-3">{t.image}</div>
                 <h3 className="font-semibold text-sm">{t.name}</h3>
                 <p className="text-xs text-gray-500 mt-1">{t.description}</p>
