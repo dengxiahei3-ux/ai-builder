@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
-import { Mail, ArrowLeft, Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -12,8 +10,6 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [registered, setRegistered] = useState(false);
-  const [resending, setResending] = useState(false);
   const router = useRouter();
 
   async function handleRegister(e: React.FormEvent) {
@@ -21,78 +17,25 @@ export default function RegisterPage() {
     setLoading(true);
     setError("");
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: name },
-        emailRedirectTo: typeof window !== "undefined"
-          ? `${window.location.origin}/auth/callback`
-          : undefined,
-      },
-    });
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, name }),
+      });
 
-    if (error) {
-      setError(error.message);
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "注册失败");
+        setLoading(false);
+      } else {
+        router.push("/auth/login?registered=true");
+      }
+    } catch (e) {
+      setError("网络错误，请重试");
       setLoading(false);
-    } else if (data?.user?.id) {
-      // 自动确认用户（服务端）
-      try {
-        await fetch("/api/confirm", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: data.user.id }),
-        });
-      } catch (_) {}
-      router.push("/auth/login?confirmed=true");
     }
-  }
-
-  async function handleResend() {
-    setResending(true);
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email,
-    });
-    if (error) {
-      setError(error.message);
-    }
-    setResending(false);
-  }
-
-  if (registered) {
-    return (
-      <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-violet-100">
-            <Mail className="h-8 w-8 text-violet-600" />
-          </div>
-          <h1 className="text-2xl font-bold mb-3">验证你的邮箱</h1>
-          <p className="text-gray-500 mb-2">
-            我们已发送验证邮件到
-          </p>
-          <p className="font-medium text-gray-900 mb-6">{email}</p>
-          <p className="text-sm text-gray-400 mb-8">
-            请检查你的收件箱（以及垃圾邮件），点击邮件中的链接完成注册。
-          </p>
-
-          <button
-            onClick={handleResend}
-            disabled={resending}
-            className="w-full rounded-full bg-violet-600 py-3 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-50 transition mb-3"
-          >
-            {resending ? "发送中..." : "重新发送验证邮件"}
-          </button>
-
-          <button
-            onClick={() => router.push("/auth/login")}
-            className="w-full rounded-full border border-gray-300 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
-          >
-            前往登录
-          </button>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -126,7 +69,7 @@ export default function RegisterPage() {
           <label className="block text-sm text-gray-600 mb-1">密码</label>
           <input
             type="password"
-            placeholder="至少6位，包含字母和数字"
+            placeholder="至少6位"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
